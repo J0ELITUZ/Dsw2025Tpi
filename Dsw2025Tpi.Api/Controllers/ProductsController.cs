@@ -25,7 +25,9 @@ namespace Dsw2025Tpi.Api.Controllers
             try
             {
                 var product = await _productsManagmentService.AddProduct(request);
-                return StatusCode(201,product);
+                return StatusCode(201,product
+             
+        );
             }
             catch (ArgumentException ae)
             {

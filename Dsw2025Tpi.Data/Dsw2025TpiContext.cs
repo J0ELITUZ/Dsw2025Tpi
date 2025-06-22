@@ -19,6 +19,8 @@ public Dsw2025TpiContext(DbContextOptions<Dsw2025TpiContext> options) : base(opt
         dbProduct.Property(p => p.Sku)
             .IsRequired()
             .HasMaxLength(50);
+        dbProduct.HasIndex(p => p.Sku)
+            .IsUnique();
         dbProduct.Property(p => p.InternalCode)
             .IsRequired()
             .HasMaxLength(50);

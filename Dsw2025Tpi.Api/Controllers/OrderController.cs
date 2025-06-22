@@ -17,7 +17,7 @@ namespace Dsw2025Tpi.Api.Controllers
         {
             _orderManagmentService = orderManagement;
         }
-        [HttpPost("api/Order")]
+        [HttpPost]
         public async Task<IActionResult> AddOrder([FromBody]OrderModel.OrderRequest request)
         {
             try

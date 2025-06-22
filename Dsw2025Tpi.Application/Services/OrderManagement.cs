@@ -35,7 +35,7 @@ namespace Dsw2025Tpi.Application.Services
 
             var orderItems = request.OrderItems.Select(item => new OrderItem
             {
-                Id = Guid.NewGuid(),
+                //Id = Guid.NewGuid(),
                 ProductId = item.ProductId,
                 Name = item.Name,
                 Description = item.Description,
@@ -50,6 +50,8 @@ namespace Dsw2025Tpi.Application.Services
             orderItems,
             DateTime.Now
              );
+
+            //PENDIENTE VERIFICAR STOCK DE PRODUCTO;
 
 
             await _repository.Add(order);

@@ -24,7 +24,9 @@ namespace Dsw2025Tpi.Api.Controllers
             try
             {
                 var product = await _productsManagmentService.AddProduct(request);
-                return StatusCode(201,product);
+                return StatusCode(201,product
+             
+        );
             }
             catch (ArgumentException ae)
             {
@@ -51,7 +53,7 @@ namespace Dsw2025Tpi.Api.Controllers
             return Ok(products); // 200
         }
 
-        [HttpGet("{id:long}")]
+        [HttpGet("{id:Guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var product = await _productsManagmentService.GetProductById(id);

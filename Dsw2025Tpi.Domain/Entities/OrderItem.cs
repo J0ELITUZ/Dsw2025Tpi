@@ -8,12 +8,6 @@ namespace Dsw2025Tpi.Domain.Entities
 {
     public class OrderItem : EntityBase
     {
-        public required string Name { get; set; }
-        public required string Description { get; set; }
-        public decimal UnitPrice { get; set; }
-        public int Quantity { get; set; }
-        public decimal Subtotal => Quantity * UnitPrice;
-
         //Forean Key Product
         public Guid ProductId { get; set; }
         public Product Product { get; set; }
@@ -21,5 +15,21 @@ namespace Dsw2025Tpi.Domain.Entities
         //Forean Key Order
         public Guid OrderId { get; set; }
         public Order Order { get; set; }
+        //public OrderItem(Guid ProductIdp, int QuantityProduct, string ProductName, string ProductDescription, decimal CurrentPriceProduct  )
+        //{
+        //    Product.CurrentUnitPrice = CurrentPriceProduct;
+        //    Product.Name = ProductName;
+        //    Product.Description = ProductDescription;
+        //    Quantity = QuantityProduct;
+        //    ProductId = ProductIdp;
+
+
+        //}
+        public decimal UnitPrice { get; set; }
+        public int Quantity { get; set; }
+        public decimal Subtotal { get; set; }
+       // public decimal Subtotal => Quantity * UnitPrice;
+
+        
     }
 }

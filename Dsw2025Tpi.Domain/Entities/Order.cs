@@ -10,27 +10,27 @@ namespace Dsw2025Tpi.Domain.Entities
     {
 
         Guid _customer;
-        List<OrderItem> _orderItems;
+        List<OrderItem> _orderItems { get; set; } = new List<OrderItem>();
 
-        public Order(string shippingAddress, string billingAddress, DateTime createdAt)
-        {
-            ShippingAddress = shippingAddress;
-            BillingAddress = billingAddress;
-            Id = Guid.NewGuid();
-            CreatedAt = createdAt;
+        //public Order(string shippingAddress, string billingAddress, DateTime createdAt)
+        //{
+        //    ShippingAddress = shippingAddress;
+        //    BillingAddress = billingAddress;
+        //    Id = Guid.NewGuid();
+        //    CreatedAt = createdAt;
 
 
-        }
+        //}
 
-        public Order(Guid customerId, string shippingAddress, string billingAddress,List<OrderItem> orderItems, DateTime createdAt)
-        {
-            _customer = customerId;
-            ShippingAddress = shippingAddress;
-            BillingAddress = billingAddress;
-            _orderItems = orderItems;
-            Id = Guid.NewGuid();
-            CreatedAt = createdAt;
-        }
+        //public Order(Guid customerId, string shippingAddress, string billingAddress,List<OrderItem> orderItems, DateTime createdAt)
+        //{
+        //    _customer = customerId;
+        //    ShippingAddress = shippingAddress;
+        //    BillingAddress = billingAddress;
+        //    _orderItems = orderItems;
+        //    Id = Guid.NewGuid();
+        //    CreatedAt = createdAt;
+        //}
 
        
         
@@ -39,14 +39,14 @@ namespace Dsw2025Tpi.Domain.Entities
         public string ShippingAddress { get; set; }
         public string BillingAddress { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public decimal TotalAmount { get; set; }
+        public decimal TotalAmount { get; set;}
 
         //Forean Key Customer
         public Guid CustomerId { get; set; }
         public Customer Customer { get; set; }
 
         //Order Items
-        public ICollection<OrderItem> OrderItems => _orderItems ?? new List<OrderItem>();
+        public ICollection<OrderItem> OrderItems { get; set; }
 
 
 

@@ -54,8 +54,9 @@ public Dsw2025TpiContext(DbContextOptions<Dsw2025TpiContext> options) : base(opt
             .HasMaxLength(200)
             .IsRequired();
         dbOrder.Property(o => o.TotalAmount)
-            .HasMaxLength(15)
             .HasPrecision(15, 2);
+        
+      
 
         var dbOrderItem = modelBuilder.Entity<OrderItem>().ToTable("OrderItems");
         dbOrderItem.Property(oi => oi.Name)
@@ -72,5 +73,9 @@ public Dsw2025TpiContext(DbContextOptions<Dsw2025TpiContext> options) : base(opt
 
     }
     public DbSet<Product> Products { get; set; }
+    public DbSet<Customer> Customers { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderItem> OrderItems { get; set; }
+    }
 
-}
+

@@ -2,10 +2,12 @@
 using Dsw2025Tpi.Application.Services;
 using Dsw2025Tpi.Data;
 using Dsw2025Tpi.Data.Repositories;
+using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 namespace Dsw2025Tpi.Api;
+using Dsw2025Tpi.Data.helpers;
 
 public class Program
 {
@@ -24,10 +26,23 @@ public class Program
         builder.Services.AddTransient<IRepository, EfRepository>();
         builder.Services.AddSwaggerGen();
         builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
-            options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Dsw2025TpiDB;Integrated Security=True"));
+        {
+
+
+            options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Dsw2025TpiDB;Integrated Security=True");
+            //options.UseSeeding((c, t) =>
+            //{
+            //    ((Dsw2025TpiContext)c).Seedwork<Customer>("sources\\Customers.json");
+            //});
+        });
         builder.Services.AddHealthChecks();
 
         var app = builder.Build();
+        using (var scope = app.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<Dsw2025TpiContext>();
+            db.Seedwork<Customer>("sources\\Customers.json");
+        }
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
@@ -43,6 +58,8 @@ public class Program
         app.MapControllers();
         
         app.MapHealthChecks("/healthcheck");
+
+       
 
         app.Run();
     }

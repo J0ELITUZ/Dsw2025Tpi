@@ -4,6 +4,7 @@ using Dsw2025Tpi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dsw2025Tpi.Data.Migrations
 {
     [DbContext(typeof(Dsw2025TpiContext))]
-    partial class Dsw2025TpiContextModelSnapshot : ModelSnapshot
+    [Migration("20250622224222_model4")]
+    partial class model4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -62,7 +65,7 @@ namespace Dsw2025Tpi.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("CustomerId")
+                    b.Property<Guid>("CustomerId1")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ShippingAddress")
@@ -79,7 +82,7 @@ namespace Dsw2025Tpi.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("CustomerId1");
 
                     b.ToTable("Orders", (string)null);
                 });
@@ -169,8 +172,8 @@ namespace Dsw2025Tpi.Data.Migrations
             modelBuilder.Entity("Dsw2025Tpi.Domain.Entities.Order", b =>
                 {
                     b.HasOne("Dsw2025Tpi.Domain.Entities.Customer", "Customer")
-                        .WithMany("Orders")
-                        .HasForeignKey("CustomerId")
+                        .WithMany()
+                        .HasForeignKey("CustomerId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -186,7 +189,7 @@ namespace Dsw2025Tpi.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("Dsw2025Tpi.Domain.Entities.Product", "Product")
-                        .WithMany("OrderItems")
+                        .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -196,17 +199,7 @@ namespace Dsw2025Tpi.Data.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Dsw2025Tpi.Domain.Entities.Customer", b =>
-                {
-                    b.Navigation("Orders");
-                });
-
             modelBuilder.Entity("Dsw2025Tpi.Domain.Entities.Order", b =>
-                {
-                    b.Navigation("OrderItems");
-                });
-
-            modelBuilder.Entity("Dsw2025Tpi.Domain.Entities.Product", b =>
                 {
                     b.Navigation("OrderItems");
                 });

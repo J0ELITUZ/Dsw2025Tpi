@@ -32,12 +32,23 @@ namespace Dsw2025Tpi.Domain.Entities
             CreatedAt = createdAt;
         }
 
-        public Customer Customer { get; set; }
+       
+        
+        
         public OrderStatus Status { get; set; }
         public string ShippingAddress { get; set; }
         public string BillingAddress { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public decimal TotalAmount { get; set; }
+
+        //Forean Key Customer
+        public Guid CustomerId { get; set; }
+        public Customer Customer { get; set; }
+
+        //Order Items
+        public ICollection<OrderItem> OrderItems => _orderItems ?? new List<OrderItem>();
+
+
 
     }
 }

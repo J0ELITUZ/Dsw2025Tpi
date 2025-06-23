@@ -23,19 +23,33 @@ namespace Dsw2025Tpi.Application.Services
         public async Task<OrderModel.OrderResponse> AddOrder(OrderModel.OrderRequest request)
         {
             if (request.CustomerId == Guid.Empty ||
-    string.IsNullOrWhiteSpace(request.ShippingAddress) ||
-    string.IsNullOrWhiteSpace(request.BillingAddress) ||
-    (request.OrderItems == null || !request.OrderItems.Any()))
+                string.IsNullOrWhiteSpace(request.ShippingAddress) ||
+                string.IsNullOrWhiteSpace(request.BillingAddress) ||
+                (request.OrderItems == null || !request.OrderItems.Any()))
             {
                 throw new ArgumentException("Valores para el pedido no válidos");
             }
 
-            //var exist = await _repository.First<Order>(o => o.Id == request.);
-            //if (exist != null) throw new DuplicatedEntityException($"Ya existe un producto con el Sku {request.InternalCode}");
+            // Validar existencia del cliente
+            var customerExists = await _repository.Exists<Customer>(c => c.Id == request.CustomerId);
+            if (!customerExists)
+            {
+                throw new ArgumentException("El cliente especificado no existe.");
+            }
 
+            // Crear la orden primero
+            var order = new Order(
+                request.CustomerId,
+                request.ShippingAddress,
+                request.BillingAddress,
+                new List<OrderItem>(),
+                DateTime.Now
+            );
+
+            // Crear los OrderItems y asignar el OrderId
             var orderItems = request.OrderItems.Select(item => new OrderItem
             {
-                //Id = Guid.NewGuid(),
+                OrderId = order.Id,
                 ProductId = item.ProductId,
                 Name = item.Name,
                 Description = item.Description,
@@ -43,20 +57,19 @@ namespace Dsw2025Tpi.Application.Services
                 Quantity = item.Quantity
             }).ToList();
 
-            var order = new Order(
-            request.CustomerId,
-            request.ShippingAddress,
-            request.BillingAddress,
-            orderItems,
-            DateTime.Now
-             );
+            // Calcular el total de la orden
+            order.TotalAmount = orderItems.Sum(item => item.Subtotal);
 
-            //PENDIENTE VERIFICAR STOCK DE PRODUCTO;
-
-
+            // Guardar la orden
             await _repository.Add(order);
+
+            // Guardar los OrderItems
+            foreach (var item in orderItems)
+            {
+                await _repository.Add(item);
+            }
+
             return new OrderResponse(order.Id);
         }
-
     }
 }

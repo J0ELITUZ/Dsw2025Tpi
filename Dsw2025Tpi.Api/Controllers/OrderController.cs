@@ -8,8 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace Dsw2025Tpi.Api.Controllers
-{       [ApiController]
-        [Route("api/[controller]")]
+{       
+    [ApiController]
+    [Route("api/[controller]")]
     public class OrderController : ControllerBase
     {
         private IOrderManagement _orderManagmentService;
@@ -17,18 +18,21 @@ namespace Dsw2025Tpi.Api.Controllers
         {
             _orderManagmentService = orderManagement;
         }
+
         [HttpPost]
-        public async Task<IActionResult> AddOrder([FromBody]OrderModel.OrderRequest request)
+        public async Task<IActionResult> AddOrder([FromBody] OrderModel.OrderRequest request)
         {
             try
             {
                 var order = await _orderManagmentService.AddOrder(request);
-                return Ok(order
-            
-        );
+                return Ok(order);
             }
             catch (ArgumentException ae)
             {
+                
+                if (ae.Message == "El cliente especificado no existe.")
+                    return NotFound(ae.Message);
+
                 return BadRequest(ae.Message);
             }
             catch (DuplicatedEntityException de)
@@ -40,7 +44,5 @@ namespace Dsw2025Tpi.Api.Controllers
                 return Problem("Se produjo un error al guardar el producto");
             }
         }
-
-
     }
 }

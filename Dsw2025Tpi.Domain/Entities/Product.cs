@@ -24,6 +24,7 @@ public class Product : EntityBase
         Id = Guid.NewGuid();
         IsActive = true;
     }
+
     public string? InternalCode { get; set; }
     public int StockCuantity { get; set; }
     public string? Description { get; set; }
@@ -31,6 +32,6 @@ public class Product : EntityBase
     public string? Name { get; set; }
     public decimal CurrentUnitPrice { get; set; }
     public bool IsActive { get; set; }
-    //public Guid? CategoryId { get; set; }
-    //public Category? Category { get; set; }
+    
+    public ICollection<OrderItem> OrderItems { get; set; } 
 }

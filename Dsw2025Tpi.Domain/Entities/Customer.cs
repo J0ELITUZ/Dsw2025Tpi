@@ -20,6 +20,9 @@ namespace Dsw2025Tpi.Domain.Entities
         public string? Name { get; set; }
         public string? PhoneNumber { get; set; }
 
+        //Orders
+        public ICollection<Order> Orders { get; set; } 
+
 
     }
 }

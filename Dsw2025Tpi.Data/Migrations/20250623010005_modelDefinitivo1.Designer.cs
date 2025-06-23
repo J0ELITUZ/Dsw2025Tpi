@@ -4,6 +4,7 @@ using Dsw2025Tpi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dsw2025Tpi.Data.Migrations
 {
     [DbContext(typeof(Dsw2025TpiContext))]
-    partial class Dsw2025TpiContextModelSnapshot : ModelSnapshot
+    [Migration("20250623010005_modelDefinitivo1")]
+    partial class modelDefinitivo1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -98,10 +101,6 @@ namespace Dsw2025Tpi.Data.Migrations
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("Subtotal")
-                        .HasPrecision(30, 2)
-                        .HasColumnType("decimal(30,2)");
 
                     b.Property<decimal>("UnitPrice")
                         .HasPrecision(15, 2)

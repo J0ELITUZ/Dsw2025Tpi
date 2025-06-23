@@ -59,11 +59,8 @@ public Dsw2025TpiContext(DbContextOptions<Dsw2025TpiContext> options) : base(opt
       
 
         var dbOrderItem = modelBuilder.Entity<OrderItem>().ToTable("OrderItems");
-        dbOrderItem.Property(oi => oi.Name)
-            .HasMaxLength(50)
-            .IsRequired();
-        dbOrderItem.Property(oi => oi.Description)
-            .HasMaxLength(300);
+        dbOrderItem.Property(oi => oi.Subtotal)
+            .HasPrecision(30, 2);
         dbOrderItem.Property(oi => oi.UnitPrice)
             .HasPrecision(15, 2)
             .IsRequired();

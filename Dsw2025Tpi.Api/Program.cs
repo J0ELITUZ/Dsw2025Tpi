@@ -30,10 +30,7 @@ public class Program
 
 
             options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Dsw2025TpiDB;Integrated Security=True");
-            //options.UseSeeding((c, t) =>
-            //{
-            //    ((Dsw2025TpiContext)c).Seedwork<Customer>("sources\\Customers.json");
-            //});
+
         });
         builder.Services.AddHealthChecks();
 
@@ -56,10 +53,10 @@ public class Program
         app.UseAuthorization();
 
         app.MapControllers();
-        
+
         app.MapHealthChecks("/healthcheck");
 
-       
+
 
         app.Run();
     }

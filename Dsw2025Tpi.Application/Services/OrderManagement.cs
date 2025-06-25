@@ -41,6 +41,26 @@ namespace Dsw2025Tpi.Application.Services
             if (customer == null)
                 throw new ArgumentException("Cliente no encontrado.");
 
+            // validar el stock de los productos
+            foreach (var item in request.OrderItems)
+            {
+                var product = await _repository.GetById<Product>(item.ProductId);
+                if (product == null)
+                    throw new ArgumentException($"Producto con ID {item.ProductId} no encontrado.");
+                if (product.StockCuantity < item.Quantity)
+                    throw new ArgumentException($"No hay suficiente stock para el producto {product.Name}.");
+            }
+            //Restar el stock de los productos
+            foreach (var item in request.OrderItems)
+            {
+                var product = await _repository.GetById<Product>(item.ProductId);
+                if (product != null)
+                {
+                    product.StockCuantity -= item.Quantity;
+                    await _repository.Update(product);
+                }
+            }
+
             // Crear la orden var order = new Order
             {
 
@@ -57,7 +77,7 @@ namespace Dsw2025Tpi.Application.Services
                 };
                 decimal total = 0;
 
-                
+
                 foreach (var item in request.OrderItems)
                 {
                     var product = await _repository.GetById<Product>(item.ProductId);
@@ -69,9 +89,9 @@ namespace Dsw2025Tpi.Application.Services
                     var orderItem = new OrderItem
                     {
 
-                        ProductId =  product.Id,
-                        Product =  product,
-                            Quantity = item.Quantity,
+                        ProductId = product.Id,
+                        Product = product,
+                        Quantity = item.Quantity,
                         UnitPrice = item.CurrentUnitPrice,
                         Subtotal = subtotal
                     };
@@ -84,12 +104,12 @@ namespace Dsw2025Tpi.Application.Services
 
                 return new OrderModel.OrderResponse(
                     added.Id,
-            added.CustomerId,
-            added.ShippingAddress,
-            added.BillingAddress,
-            added.CreatedAt,
-            added.TotalAmount,
-            added.OrderItems.Select(oi => new OrderModel.OrderItemResponse(
+                    added.CustomerId,
+                    added.ShippingAddress,
+                    added.BillingAddress,
+                    added.CreatedAt,
+                    added.TotalAmount,
+                    added.OrderItems.Select(oi => new OrderModel.OrderItemResponse(
                 oi.ProductId,
                 oi.Product?.Name ?? "",
                 oi.Product?.Description ?? "",
@@ -104,28 +124,6 @@ namespace Dsw2025Tpi.Application.Services
 
 
 
-                //    var orderItems = request.OrderItems.Select(item => new OrderItem
-                //{
-                //    OrderId = order.Id,
-                //    ProductId = item.ProductId,
-                //    UnitPrice = item.CurrentUnitPrice,
-                //    Quantity = item.Quantity
-                //}).ToList();
-
-                // Calcular el total de la orden
-                //order.TotalAmount = orderItems.Sum(item => item.Subtotal);
-
-                //// Guardar la orden
-                //await _repository.Add(order);
-
-                //// Guardar los OrderItems
-                //foreach (var item in orderItems)
-                //{
-                //    await _repository.Add(item);
-                //}
-
-                //return new OrderResponse(order.Id);
             }
         }
     }
-}

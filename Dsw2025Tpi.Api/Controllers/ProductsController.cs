@@ -7,26 +7,27 @@ using Microsoft.EntityFrameworkCore;
 namespace Dsw2025Tpi.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/products")]
     public class ProductsController : ControllerBase
     {
-        
+
         private IProductsManagementService _productsManagmentService;
 
         public ProductsController(IProductsManagementService productsManagementService)
         {
-           
+
             _productsManagmentService = productsManagementService;
         }
 
+        //Agregar un producto
         [HttpPost]
-        public async Task<IActionResult> AddProduct([FromBody] ProductModel.Request request)
+        public async Task<IActionResult> AddProduct([FromBody] ProductModel.ProductRequest request)
         {
             try
             {
                 var product = await _productsManagmentService.AddProduct(request);
-                return StatusCode(201,product
-             
+                return Created("Products", product
+
         );
             }
             catch (ArgumentException ae)
@@ -43,6 +44,7 @@ namespace Dsw2025Tpi.Api.Controllers
             }
         }
 
+        // Obtener todos los productos
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -51,9 +53,10 @@ namespace Dsw2025Tpi.Api.Controllers
             if (!products.Any())
                 return NoContent(); // 204
 
-            return Ok(products); // 200
+            return Ok(products);  //200
         }
 
+        // Obtener un producto por ID
         [HttpGet("{id:Guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -65,7 +68,8 @@ namespace Dsw2025Tpi.Api.Controllers
             return Ok(product); // 200
         }
 
-        [HttpPatch("{id:Guid}")] 
+        //deshabilitar un producto
+        [HttpPatch("{id:Guid}")]
         public async Task<IActionResult> Disable(Guid id)
         {
             var success = await _productsManagmentService.DisableProductAsync(id);
@@ -76,12 +80,10 @@ namespace Dsw2025Tpi.Api.Controllers
             return NoContent(); // 204
         }
 
+        // Actualizar un producto por ID
         [HttpPut("{id:Guid}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] ProductModel.Request request)
+        public async Task<IActionResult> Update(Guid id, [FromBody] ProductModel.ProductRequest request)
         {
-            
-
-            // 400
             if (request == null ||
                 string.IsNullOrWhiteSpace(request.Sku) ||
                 string.IsNullOrWhiteSpace(request.InternalCode) ||
@@ -90,27 +92,15 @@ namespace Dsw2025Tpi.Api.Controllers
                 return BadRequest();
             }
 
-            var existingProduct = await _productsManagmentService.GetProductById(id);
-
-
-            if (existingProduct is null)
-                return NotFound(); // 404
-
-            // Actualizar los campos del producto existente
-            existingProduct.Sku = request.Sku;
-            existingProduct.InternalCode = request.InternalCode;
-            existingProduct.Name = request.Name;
-            existingProduct.Description = request.Descripcion;
-            existingProduct.CurrentUnitPrice = request.Price;
-            existingProduct.StockCuantity = request.Stock;
-           
-
-
-            await _productsManagmentService.UpdateAsync(existingProduct);
-
-            return Ok(existingProduct); // 200
-
-
+            try
+            {
+                var response = await _productsManagmentService.UpdateAsync(request, id);
+                return Ok(response);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
         }
     }
 }

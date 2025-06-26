@@ -26,8 +26,8 @@ namespace Dsw2025Tpi.Application.Services
         {
             if (request.CustomerId == Guid.Empty ||
                 string.IsNullOrWhiteSpace(request.ShippingAddress) ||
-                string.IsNullOrWhiteSpace(request.BillingAddress) ||
-                (request.OrderItems == null || !request.OrderItems.Any()))
+                string.IsNullOrWhiteSpace(request.BillingAddress))
+
             {
                 throw new ArgumentException("Valores para el pedido no válidos");
             }
@@ -41,27 +41,28 @@ namespace Dsw2025Tpi.Application.Services
             if (customer == null)
                 throw new ArgumentException("Cliente no encontrado.");
 
-            // validar el stock de los productos
+            // validaciones
             foreach (var item in request.OrderItems)
             {
                 var product = await _repository.GetById<Product>(item.ProductId);
+
                 if (product == null)
                     throw new ArgumentException($"Producto con ID {item.ProductId} no encontrado.");
+
                 if (product.StockCuantity < item.Quantity)
                     throw new ArgumentException($"No hay suficiente stock para el producto {product.Name}.");
-            }
-            //Restar el stock de los productos
-            foreach (var item in request.OrderItems)
-            {
-                var product = await _repository.GetById<Product>(item.ProductId);
-                if (product != null)
+
+                if (item.Quantity <= 0)
+                    throw new ArgumentException($"La cantidad del producto {item.Name} debe ser mayor a 0.");
+                else
                 {
-                    product.StockCuantity -= item.Quantity;
+                    product.StockCuantity -= item.Quantity; // Restar la cantidad del stock del producto
                     await _repository.Update(product);
                 }
-            }
 
-            // Crear la orden var order = new Order
+            }
+                       
+            // Crear la orden 
             {
 
                 var order = new Order
@@ -77,14 +78,11 @@ namespace Dsw2025Tpi.Application.Services
                 };
                 decimal total = 0;
 
-
+                //Crear los items de la orden
                 foreach (var item in request.OrderItems)
                 {
                     var product = await _repository.GetById<Product>(item.ProductId);
                     if (product == null) throw new ArgumentException("Producto no encontrado");
-
-
-                    var subtotal = item.CurrentUnitPrice * item.Quantity;
 
                     var orderItem = new OrderItem
                     {
@@ -93,13 +91,14 @@ namespace Dsw2025Tpi.Application.Services
                         Product = product,
                         Quantity = item.Quantity,
                         UnitPrice = item.CurrentUnitPrice,
-                        Subtotal = subtotal
+                        Subtotal = item.CurrentUnitPrice * item.Quantity
                     };
                     order.OrderItems.Add(orderItem);
-                    total += subtotal;
-
+                    total += orderItem.Subtotal;
                 }
+
                 order.TotalAmount = total;
+
                 var added = await _repository.Add(order);
 
                 return new OrderModel.OrderResponse(
@@ -111,8 +110,8 @@ namespace Dsw2025Tpi.Application.Services
                     added.TotalAmount,
                     added.OrderItems.Select(oi => new OrderModel.OrderItemResponse(
                 oi.ProductId,
-                oi.Product?.Name ?? "",
-                oi.Product?.Description ?? "",
+                oi.Product.Name,
+                oi.Product.Description,
                 oi.UnitPrice,
                 oi.Quantity,
                 oi.Subtotal
@@ -127,3 +126,4 @@ namespace Dsw2025Tpi.Application.Services
             }
         }
     }
+}

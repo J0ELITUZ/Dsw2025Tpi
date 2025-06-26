@@ -9,8 +9,8 @@ namespace Dsw2025Tpi.Domain.Entities
     public class Order : EntityBase
     {
 
-        Guid _customer;
-        List<OrderItem> _orderItems { get; set; } = new List<OrderItem>();
+        //Guid _customer;
+        //List<OrderItem> _orderItems { get; set; } = new List<OrderItem>();
 
         //public Order(string shippingAddress, string billingAddress, DateTime createdAt)
         //{
@@ -32,21 +32,21 @@ namespace Dsw2025Tpi.Domain.Entities
         //    CreatedAt = createdAt;
         //}
 
-       
-        
-        
+
+
+
         public OrderStatus Status { get; set; }
         public string ShippingAddress { get; set; }
         public string BillingAddress { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public decimal TotalAmount { get; set;}
+        public decimal TotalAmount { get; set; }
 
         //Forean Key Customer
         public Guid CustomerId { get; set; }
         public Customer Customer { get; set; }
 
         //Order Items
-        public ICollection<OrderItem> OrderItems { get; set; }
+        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
 
 

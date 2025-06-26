@@ -68,12 +68,12 @@ public class ProductsManagementService : IProductsManagementService
             string.IsNullOrWhiteSpace(request.InternalCode) ||
             string.IsNullOrWhiteSpace(request.Descripcion) ||
             string.IsNullOrWhiteSpace(request.Name) ||
-            request.Price < 0 ||
+            
             request.Stock < 0)
         {
             throw new ArgumentException("Valores para el producto no validos");
         }
-
+        if(request.Price <= 0) throw new ArgumentException("El precio del producto no puede ser cero o menor.");
         var exist = await _repository.First<Product>(p => p.Sku == request.Sku);
         if (exist != null) throw new DuplicatedEntityException($"Ya existe un producto con el Sku {request.Sku}");
 

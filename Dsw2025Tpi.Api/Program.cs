@@ -22,7 +22,6 @@ public class Program
         builder.Services.AddScoped<IProductsManagementService, ProductsManagementService>();
         builder.Services.AddScoped<IOrderManagement, OrderManagement>();
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddTransient<ProductsManagementService>();
         builder.Services.AddTransient<IRepository, EfRepository>();
         builder.Services.AddSwaggerGen();
         builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
@@ -40,6 +39,7 @@ public class Program
             var db = scope.ServiceProvider.GetRequiredService<Dsw2025TpiContext>();
             db.Seedwork<Customer>("sources\\Customers.json");
         }
+
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())

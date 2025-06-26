@@ -9,8 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Dsw2025Tpi.Application.Dtos.ProductModel;
-using Microsoft.EntityFrameworkCore;
+
 
 
 
@@ -26,20 +25,44 @@ public class ProductsManagementService : IProductsManagementService
         _context = context;
         _repository = repository;
     }
-
-    public async Task<Product?> GetProductById(Guid id)
+    //obtener un producto por ID
+    public async Task<ProductModel.ProductResponseUpdate>? GetProductById(Guid id)
     {
-        return await _repository.GetById<Product>(id);
+        var product = await _repository.GetById<Product>(id);
+        if (product == null) return null;
+
+        return new ProductModel.ProductResponseUpdate(
+            product.Id,
+            product.Sku,
+            product.Name,
+            product.CurrentUnitPrice,
+            product.InternalCode,
+            product.Description,
+            product.StockCuantity,
+            product.IsActive
+        );
+
     }
 
-
-    public async Task<List<Product>?> GetProducts()
+    //obtener todos los productos
+    public async Task<List<ProductModel.ProductResponseUpdate>> GetProducts()
     {
         var products = await _repository.GetAll<Product>();
-        return products?.ToList() ?? new List<Product>();
+        return products.Where(p => p.IsActive == true).Select(p => new ProductModel.ProductResponseUpdate(
+        p.Id,
+        p.Sku,
+        p.Name,
+        p.CurrentUnitPrice,
+        p.InternalCode,
+        p.Description,
+        p.StockCuantity,
+        p.IsActive
+    )).ToList();
+    
     }
 
-    public async Task<ProductModel.Response> AddProduct(ProductModel.Request request)
+    // Agregar un nuevo producto
+    public async Task<ProductModel.ProductResponse> AddProduct(ProductModel.ProductRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Sku) ||
             string.IsNullOrWhiteSpace(request.InternalCode) ||
@@ -51,14 +74,16 @@ public class ProductsManagementService : IProductsManagementService
             throw new ArgumentException("Valores para el producto no validos");
         }
 
-        var exist = await _repository.First<Product>(p => p.InternalCode == request.InternalCode);
-        if (exist != null) throw new DuplicatedEntityException($"Ya existe un producto con el Sku {request.InternalCode}");
+        var exist = await _repository.First<Product>(p => p.Sku == request.Sku);
+        if (exist != null) throw new DuplicatedEntityException($"Ya existe un producto con el Sku {request.Sku}");
 
         var product = new Product(request.Sku, request.InternalCode, request.Descripcion, request.Name, request.Price, request.Stock);
 
         await _repository.Add(product);
-        return new ProductModel.Response(product.Id);
+        return new ProductModel.ProductResponse(product.Id, product.Sku, product.Name, product.CurrentUnitPrice, product.InternalCode, product.Description, product.StockCuantity);
     }
+
+    // Deshabilitar un producto por ID
     public async Task<bool> DisableProductAsync(Guid id)
     {
         var product = await _context.Products.FindAsync(id);
@@ -71,29 +96,38 @@ public class ProductsManagementService : IProductsManagementService
         return true;
     }
 
-    public async Task<Product> UpdateAsync(Product product)
+    // Actualizar un producto por ID
+    public async Task<ProductModel.ProductResponseUpdate> UpdateAsync(ProductModel.ProductRequest request, Guid id)
     {
-        var existingProduct = await GetProductById(product.Id);
+        var product = await _repository.GetById<Product>(id);
+        if (product == null)
+            throw new KeyNotFoundException($"Producto con ID {id} no encontrado.");
 
-        if (existingProduct == null)
-        {
-            throw new KeyNotFoundException($"Product with ID {product.Id} not found.");
-        }
+        // Actualiza los campos de la entidad
+        product.Sku = request.Sku;
+        product.InternalCode = request.InternalCode;
+        product.Name = request.Name;
+        product.Description = request.Descripcion;
+        product.CurrentUnitPrice = request.Price;
+        product.StockCuantity = request.Stock;
 
-        existingProduct.Name = product.Name;
-        existingProduct.Description = product.Description;
-        existingProduct.CurrentUnitPrice = product.CurrentUnitPrice;
-        existingProduct.StockCuantity = product.StockCuantity;
-        existingProduct.Sku = product.Sku;
-        existingProduct.InternalCode = product.InternalCode;
-        existingProduct.IsActive = product.IsActive;
+        // Guarda los cambios
+        await _repository.Update(product);
 
-        await _repository.Update(existingProduct);
-
-        return existingProduct;
-
-
+        // Mapea a DTO de respuesta
+        return new ProductModel.ProductResponseUpdate(
+            product.Id,
+            product.Sku,
+            product.Name,
+            product.CurrentUnitPrice,
+            product.InternalCode,
+            product.Description,
+            product.StockCuantity,
+            product.IsActive
+        );
     }
+ 
+   
 }
 
 

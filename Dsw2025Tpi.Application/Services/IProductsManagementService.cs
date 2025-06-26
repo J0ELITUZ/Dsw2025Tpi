@@ -5,10 +5,10 @@ namespace Dsw2025Tpi.Application.Services
 {
     public interface IProductsManagementService
     {
-        Task<ProductModel.Response> AddProduct(ProductModel.Request request);
-        Task<Product?> GetProductById(Guid id);
-        Task<List<Product>?> GetProducts();
+        Task<ProductModel.ProductResponse> AddProduct(ProductModel.ProductRequest request);
+        Task<ProductModel.ProductResponseUpdate>? GetProductById(Guid id);
+        Task<List<ProductModel.ProductResponseUpdate>?> GetProducts();
         Task<bool> DisableProductAsync(Guid id); 
-        Task<Product> UpdateAsync(Product product);
+        Task<ProductModel.ProductResponseUpdate> UpdateAsync(ProductModel.ProductRequest request, Guid id);
     }
-}
+} 

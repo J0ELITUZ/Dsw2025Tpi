@@ -55,8 +55,11 @@ public Dsw2025TpiContext(DbContextOptions<Dsw2025TpiContext> options) : base(opt
             .IsRequired();
         dbOrder.Property(o => o.TotalAmount)
             .HasPrecision(15, 2);
-        
-      
+        dbOrder.Property(o => o.TotalAmount)
+            .IsRequired();
+          
+
+
 
         var dbOrderItem = modelBuilder.Entity<OrderItem>().ToTable("OrderItems");
         dbOrderItem.Property(oi => oi.Subtotal)
@@ -66,6 +69,10 @@ public Dsw2025TpiContext(DbContextOptions<Dsw2025TpiContext> options) : base(opt
             .IsRequired();
         dbOrderItem.Property(oi => oi.Quantity)
             .IsRequired();
+        dbOrderItem.Property(oi => oi.Subtotal)
+            .IsRequired();
+        dbOrderItem.Property(oi=>oi.Subtotal)
+            .HasPrecision(30, 2);
 
 
     }

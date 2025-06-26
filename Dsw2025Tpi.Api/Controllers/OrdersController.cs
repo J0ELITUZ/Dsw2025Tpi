@@ -10,22 +10,23 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 namespace Dsw2025Tpi.Api.Controllers
 {       
     [ApiController]
-    [Route("api/[controller]")]
-    public class OrderController : ControllerBase
+    [Route("api/orders")]
+    public class OrdersController : ControllerBase
     {
         private IOrderManagement _orderManagmentService;
-        public OrderController(IOrderManagement orderManagement)
+        public OrdersController(IOrderManagement orderManagement)
         {
             _orderManagmentService = orderManagement;
         }
 
+        //Agregar una orden
         [HttpPost]
         public async Task<IActionResult> AddOrder([FromBody] OrderModel.OrderRequest request)
         {
             try
             {
                 var order = await _orderManagmentService.AddOrder(request);
-                return Ok(order);
+                return Created("api/orders",order);
             }
             catch (ArgumentException ae)
             {
@@ -39,9 +40,9 @@ namespace Dsw2025Tpi.Api.Controllers
             {
                 return Conflict(de.Message);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return Problem("Se produjo un error al guardar el producto");
+                return BadRequest(e.Message);
             }
         }
     }

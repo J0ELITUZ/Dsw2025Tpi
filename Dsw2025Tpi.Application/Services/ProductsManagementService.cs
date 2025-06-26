@@ -77,7 +77,7 @@ public class ProductsManagementService : IProductsManagementService
         var exist = await _repository.First<Product>(p => p.Sku == request.Sku);
         if (exist != null) throw new DuplicatedEntityException($"Ya existe un producto con el Sku {request.Sku}");
 
-        var product = new Product(request.Sku, request.InternalCode, request.Descripcion, request.Name, request.Price, request.Stock);
+        var product = new Product(request.Sku, request.InternalCode, request.Name, request.Descripcion, request.Price, request.Stock);
 
         await _repository.Add(product);
         return new ProductModel.ProductResponse(product.Id, product.Sku, product.Name, product.CurrentUnitPrice, product.InternalCode, product.Description, product.StockCuantity);

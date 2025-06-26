@@ -26,7 +26,7 @@ namespace Dsw2025Tpi.Api.Controllers
             try
             {
                 var product = await _productsManagmentService.AddProduct(request);
-                return Created("Products", product
+                return Created("api/products", product
 
         );
             }

@@ -93,13 +93,13 @@ namespace Dsw2025Tpi.Application.Services
                         Product = product,
                         Quantity = item.Quantity,
                         UnitPrice = item.CurrentUnitPrice,
-                        Subtotal = item.CurrentUnitPrice * item.Quantity
+                        
                     };
                     order.OrderItems.Add(orderItem);
                     total += orderItem.Subtotal;
                 }
 
-                order.TotalAmount = total;
+                
 
                 var added = await _repository.Add(order);
 

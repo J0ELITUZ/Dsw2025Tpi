@@ -39,7 +39,7 @@ namespace Dsw2025Tpi.Domain.Entities
         public string? ShippingAddress { get; set; }
         public string? BillingAddress { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public decimal TotalAmount { get; set; }
+        public decimal TotalAmount => OrderItems.Sum(item => item.Subtotal);
 
         //Forean Key Customer
         public Guid CustomerId { get; set; }

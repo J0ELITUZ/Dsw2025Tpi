@@ -49,7 +49,7 @@ public class ProductsManagementService : IProductsManagementService
     {
         var products = await _repository.GetAll<Product>();
 
-        if (products == null || !products.Any())
+        if (products == null || !products.Any() || products.Where(p => p.IsActive) == null)
         {
             throw new EntityNotFoundException("No se encontraron productos activos.");
         }

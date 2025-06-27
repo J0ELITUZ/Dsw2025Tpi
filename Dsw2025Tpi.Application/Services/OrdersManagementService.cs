@@ -29,7 +29,7 @@ namespace Dsw2025Tpi.Application.Services
                 string.IsNullOrWhiteSpace(request.BillingAddress))
 
             {
-                throw new ArgumentException("Valores para el pedido no válidos");
+                throw new ArgumentException("Ingrese dirección de envio y/o facturación");
             }
 
             // Validar que la lista de OrderItems no esté vacía
@@ -45,7 +45,10 @@ namespace Dsw2025Tpi.Application.Services
             foreach (var item in request.OrderItems)
             {
                 var product = await _repository.GetById<Product>(item.ProductId);
-
+                if (product.IsActive == false)
+                    throw new ArgumentException("producto no dispnible, campo IsActive false");
+                if (item.CurrentUnitPrice != product.CurrentUnitPrice)
+                    throw new ArgumentException("Precio de producto no coincidente");
                 if (product == null)
                     throw new EntityNotFoundException($"Producto con ID {item.ProductId} no encontrado.");
                 if (item.Description != product.Description || item.Name != product.Name)
@@ -64,42 +67,19 @@ namespace Dsw2025Tpi.Application.Services
 
             }
 
-            // Crear la orden 
-            {
-
-                var order = new Order
-                {
-                    CreatedAt = DateTime.UtcNow,
-                    ShippingAddress = request.ShippingAddress,
-                    BillingAddress = request.BillingAddress,
-
-                    Status = OrderStatus.Pending,
-                    CustomerId = customer.Id,
-                    Customer = customer,
-                    OrderItems = new List<OrderItem>()
-                };
-                decimal total = 0;
-
+             
+            
+                var orderItems = new List<OrderItem>();
                 //Crear los items de la orden
                 foreach (var item in request.OrderItems)
                 {
                     var product = await _repository.GetById<Product>(item.ProductId);
-
-
-                    var orderItem = new OrderItem
-                    {
-
-                        ProductId = product.Id,
-                        Product = product,
-                        Quantity = item.Quantity,
-                        UnitPrice = item.CurrentUnitPrice,
-                        
-                    };
-                    order.OrderItems.Add(orderItem);
-                    total += orderItem.Subtotal;
+                    var orderItem = new OrderItem(product.Id, product, item.Quantity, item.CurrentUnitPrice);
+                    orderItems.Add(orderItem);
                 }
-
-                
+                // Crear la orden
+                var order = new Order(customer.Id, request.ShippingAddress, request.BillingAddress,
+                    orderItems, DateTime.UtcNow, OrderStatus.Pending);
 
                 var added = await _repository.Add(order);
 
@@ -111,21 +91,22 @@ namespace Dsw2025Tpi.Application.Services
                     added.CreatedAt,
                     added.TotalAmount,
                     added.OrderItems.Select(oi => new OrderModel.OrderItemResponse(
-                oi.ProductId,
-                oi.Product?.Name ?? "",
-                oi.Product?.Description ?? "",
-                oi.UnitPrice,
-                oi.Quantity,
-                oi.Subtotal
-            )).ToList(),
-            added.Status.ToString()
+                        oi.ProductId,
+                        oi.Product?.Name ?? "",
+                        oi.Product?.Description ?? "",
+                        oi.UnitPrice,
+                        oi.Quantity,
+                        oi.Subtotal)).ToList(),
+                    added.Status.ToString());
+                    
+            
 
-                    );
+                    
 
 
 
 
-            }
+            
         }
     }
 }

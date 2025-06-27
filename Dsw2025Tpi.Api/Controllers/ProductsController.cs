@@ -59,15 +59,13 @@ namespace Dsw2025Tpi.Api.Controllers
             }
             catch(EntityNotFoundException enft)
             {
-                return NotFound(enft.Message); // 404
+                return NoContent(); // 204
             }
             catch (Exception e)
             {
                 return Problem("Se produjo un error al obtener los productos, {0}", e.Message);
             }   
-
-
-            
+                        
         }
 
         // Obtener un producto por ID #chek

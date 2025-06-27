@@ -53,7 +53,8 @@ public Dsw2025TpiContext(DbContextOptions<Dsw2025TpiContext> options) : base(opt
         dbOrder.Property(o => o.BillingAddress)
             .HasMaxLength(200)
             .IsRequired();
-
+        dbOrder.Property(o => o.Notes)
+            .HasMaxLength(500);
         dbOrder.Ignore(o => o.TotalAmount);
             
           

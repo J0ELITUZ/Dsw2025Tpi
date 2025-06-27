@@ -43,7 +43,7 @@ namespace Dsw2025Tpi.Api.Controllers
             catch (Exception e)
             {
                 return Problem(e.Message);
-            } //corregir las excepciones para personalizarlas
+            } 
         }
     }
 }

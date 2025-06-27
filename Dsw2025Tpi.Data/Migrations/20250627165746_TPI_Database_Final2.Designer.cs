@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dsw2025Tpi.Data.Migrations
 {
     [DbContext(typeof(Dsw2025TpiContext))]
-    [Migration("20250623030339_def")]
-    partial class def
+    [Migration("20250627165746_TPI_Database_Final2")]
+    partial class TPI_Database_Final2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -68,6 +68,10 @@ namespace Dsw2025Tpi.Data.Migrations
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<string>("ShippingAddress")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -75,10 +79,6 @@ namespace Dsw2025Tpi.Data.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasPrecision(15, 2)
-                        .HasColumnType("decimal(15,2)");
 
                     b.HasKey("Id");
 
@@ -101,10 +101,6 @@ namespace Dsw2025Tpi.Data.Migrations
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("Subtotal")
-                        .HasPrecision(30, 2)
-                        .HasColumnType("decimal(30,2)");
 
                     b.Property<decimal>("UnitPrice")
                         .HasPrecision(15, 2)

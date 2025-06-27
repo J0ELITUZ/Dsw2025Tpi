@@ -9,41 +9,44 @@ namespace Dsw2025Tpi.Domain.Entities
     public class Order : EntityBase
     {
 
-        //Guid _customer;
-        //List<OrderItem> _orderItems { get; set; } = new List<OrderItem>();
-
-        //public Order(string shippingAddress, string billingAddress, DateTime createdAt)
-        //{
-        //    ShippingAddress = shippingAddress;
-        //    BillingAddress = billingAddress;
-        //    Id = Guid.NewGuid();
-        //    CreatedAt = createdAt;
-
-
-        //}
-
-        //public Order(Guid customerId, string shippingAddress, string billingAddress,List<OrderItem> orderItems, DateTime createdAt)
-        //{
-        //    _customer = customerId;
-        //    ShippingAddress = shippingAddress;
-        //    BillingAddress = billingAddress;
-        //    _orderItems = orderItems;
-        //    Id = Guid.NewGuid();
-        //    CreatedAt = createdAt;
-        //}
-
+        public Order()
+        {
+            
+        }
+        public Order(Guid customerId, string shippingAddress, string billingAddress, List<OrderItem> orderItems, DateTime createdAt, OrderStatus status)
+        {
+            CustomerId = customerId;
+            ShippingAddress = shippingAddress;
+            BillingAddress = billingAddress;
+            OrderItems = orderItems;
+            Id = Guid.NewGuid();
+            CreatedAt = createdAt;
+            Status = status;
+        }
+        public Order(Guid customerId, string shippingAddress, string billingAddress,string notes, List<OrderItem> orderItems, DateTime createdAt, OrderStatus status)
+        {
+            CustomerId = customerId;
+            ShippingAddress = shippingAddress;
+            BillingAddress = billingAddress;
+            Notes = notes;
+            OrderItems = orderItems;
+            Id = Guid.NewGuid();
+            CreatedAt = createdAt;
+            Status = status;
+        }
 
 
 
         public OrderStatus Status { get; set; }
-        public string ShippingAddress { get; set; }
-        public string BillingAddress { get; set; }
+        public string? ShippingAddress { get; set; }
+        public string? BillingAddress { get; set; }
+        public string? Notes { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public decimal TotalAmount { get; set; }
+        public decimal TotalAmount => OrderItems.Sum(item => item.Subtotal);
 
         //Forean Key Customer
         public Guid CustomerId { get; set; }
-        public Customer Customer { get; set; }
+        public Customer? Customer { get; set; }
 
         //Order Items
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();

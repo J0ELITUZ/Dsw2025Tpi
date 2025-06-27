@@ -20,7 +20,7 @@ public class Program
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddScoped<IProductsManagementService, ProductsManagementService>();
-        builder.Services.AddScoped<IOrderManagement, OrderManagement>();
+        builder.Services.AddScoped<IOrderManagementService, OrderManagement>();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddTransient<IRepository, EfRepository>();
         builder.Services.AddSwaggerGen();

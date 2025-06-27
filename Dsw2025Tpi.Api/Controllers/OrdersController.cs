@@ -8,13 +8,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace Dsw2025Tpi.Api.Controllers
-{       
+{
     [ApiController]
     [Route("api/orders")]
     public class OrdersController : ControllerBase
     {
-        private IOrderManagement _orderManagmentService;
-        public OrdersController(IOrderManagement orderManagement)
+        private IOrderManagementService _orderManagmentService;
+        public OrdersController(IOrderManagementService orderManagement)
         {
             _orderManagmentService = orderManagement;
         }
@@ -26,15 +26,15 @@ namespace Dsw2025Tpi.Api.Controllers
             try
             {
                 var order = await _orderManagmentService.AddOrder(request);
-                return Created("api/orders",order);
+                return Created("api/orders", order);
             }
             catch (ArgumentException ae)
             {
-                
-                if (ae.Message == "El cliente especificado no existe.")
-                    return NotFound(ae.Message);
-
                 return BadRequest(ae.Message);
+            }
+            catch (EntityNotFoundException enfe)
+            {
+                return NotFound(enfe.Message);
             }
             catch (DuplicatedEntityException de)
             {
@@ -42,8 +42,8 @@ namespace Dsw2025Tpi.Api.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
-            }
+                return Problem(e.Message);
+            } 
         }
     }
 }

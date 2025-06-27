@@ -53,26 +53,22 @@ public Dsw2025TpiContext(DbContextOptions<Dsw2025TpiContext> options) : base(opt
         dbOrder.Property(o => o.BillingAddress)
             .HasMaxLength(200)
             .IsRequired();
-        dbOrder.Property(o => o.TotalAmount)
-            .HasPrecision(15, 2);
-        dbOrder.Property(o => o.TotalAmount)
-            .IsRequired();
+        dbOrder.Property(o => o.Notes)
+            .HasMaxLength(500);
+        dbOrder.Ignore(o => o.TotalAmount);
+            
           
 
 
 
         var dbOrderItem = modelBuilder.Entity<OrderItem>().ToTable("OrderItems");
-        dbOrderItem.Property(oi => oi.Subtotal)
-            .HasPrecision(30, 2);
-        dbOrderItem.Property(oi => oi.UnitPrice)
+                dbOrderItem.Property(oi => oi.UnitPrice)
             .HasPrecision(15, 2)
             .IsRequired();
         dbOrderItem.Property(oi => oi.Quantity)
             .IsRequired();
-        dbOrderItem.Property(oi => oi.Subtotal)
-            .IsRequired();
-        dbOrderItem.Property(oi=>oi.Subtotal)
-            .HasPrecision(30, 2);
+        dbOrderItem.Ignore(oi => oi.Subtotal);
+           
 
 
     }

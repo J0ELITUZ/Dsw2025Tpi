@@ -14,7 +14,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Dsw2025Tpi.Application.Services
 {
-    public class OrderManagement : IOrderManagement
+    public class OrderManagement : IOrderManagementService
     {
         private readonly IRepository _repository;
         public OrderManagement(IRepository repostory)
@@ -29,7 +29,7 @@ namespace Dsw2025Tpi.Application.Services
                 string.IsNullOrWhiteSpace(request.BillingAddress))
 
             {
-                throw new ArgumentException("Valores para el pedido no válidos");
+                throw new ArgumentException("Ingrese dirección de envio y/o facturación");
             }
 
             // Validar que la lista de OrderItems no esté vacía
@@ -39,65 +39,47 @@ namespace Dsw2025Tpi.Application.Services
             // Validar existencia del cliente
             var customer = await _repository.GetById<Customer>(request.CustomerId);
             if (customer == null)
-                throw new ArgumentException("Cliente no encontrado.");
+                throw new EntityNotFoundException($"Cliente no encontrado.");
 
             // validaciones
             foreach (var item in request.OrderItems)
             {
                 var product = await _repository.GetById<Product>(item.ProductId);
-
+                if (product.IsActive == false)
+                    throw new ArgumentException("producto no dispnible, campo IsActive false");
+                if (item.CurrentUnitPrice != product.CurrentUnitPrice)
+                    throw new ArgumentException("Precio de producto no coincidente");
                 if (product == null)
-                    throw new ArgumentException($"Producto con ID {item.ProductId} no encontrado.");
-
+                    throw new EntityNotFoundException($"Producto con ID {item.ProductId} no encontrado.");
+                if (item.Description != product.Description || item.Name != product.Name)
+                    throw new ArgumentException("Datos de descripcion o nombre no coincidentes");
                 if (product.StockCuantity < item.Quantity)
                     throw new ArgumentException($"No hay suficiente stock para el producto {product.Name}.");
-
                 if (item.Quantity <= 0)
                     throw new ArgumentException($"La cantidad del producto {item.Name} debe ser mayor a 0.");
+                if (item.CurrentUnitPrice <= 0)
+                    throw new ArgumentException($"El precio del producto {item.Name} debe ser mayor a 0.");
                 else
                 {
-                    product.StockCuantity -= item.Quantity; // Restar la cantidad del stock del producto
+                    product.RestarStock(item.Quantity); // Restar la cantidad del producto del stock
                     await _repository.Update(product);
                 }
 
             }
-                       
-            // Crear la orden 
-            {
 
-                var order = new Order
-                {
-                    CreatedAt = DateTime.UtcNow,
-                    ShippingAddress = request.ShippingAddress,
-                    BillingAddress = request.BillingAddress,
-
-                    Status = OrderStatus.Pending,
-                    CustomerId = customer.Id,
-                    Customer = customer,
-                    OrderItems = new List<OrderItem>()
-                };
-                decimal total = 0;
-
+             
+            
+                var orderItems = new List<OrderItem>();
                 //Crear los items de la orden
                 foreach (var item in request.OrderItems)
                 {
                     var product = await _repository.GetById<Product>(item.ProductId);
-                    if (product == null) throw new ArgumentException("Producto no encontrado");
-
-                    var orderItem = new OrderItem
-                    {
-
-                        ProductId = product.Id,
-                        Product = product,
-                        Quantity = item.Quantity,
-                        UnitPrice = item.CurrentUnitPrice,
-                        Subtotal = item.CurrentUnitPrice * item.Quantity
-                    };
-                    order.OrderItems.Add(orderItem);
-                    total += orderItem.Subtotal;
+                    var orderItem = new OrderItem(product.Id, product, item.Quantity, item.CurrentUnitPrice);
+                    orderItems.Add(orderItem);
                 }
-
-                order.TotalAmount = total;
+                // Crear la orden
+                var order = new Order(customer.Id, request.ShippingAddress, request.BillingAddress,
+                    orderItems, DateTime.UtcNow, OrderStatus.Pending);
 
                 var added = await _repository.Add(order);
 
@@ -109,21 +91,22 @@ namespace Dsw2025Tpi.Application.Services
                     added.CreatedAt,
                     added.TotalAmount,
                     added.OrderItems.Select(oi => new OrderModel.OrderItemResponse(
-                oi.ProductId,
-                oi.Product.Name,
-                oi.Product.Description,
-                oi.UnitPrice,
-                oi.Quantity,
-                oi.Subtotal
-            )).ToList(),
-            added.Status.ToString()
+                        oi.ProductId,
+                        oi.Product?.Name ?? "",
+                        oi.Product?.Description ?? "",
+                        oi.UnitPrice,
+                        oi.Quantity,
+                        oi.Subtotal)).ToList(),
+                    added.Status.ToString());
+                    
+            
 
-                    );
+                    
 
 
 
 
-            }
+            
         }
     }
 }

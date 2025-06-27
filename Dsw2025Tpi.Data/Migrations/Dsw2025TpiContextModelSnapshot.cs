@@ -65,6 +65,10 @@ namespace Dsw2025Tpi.Data.Migrations
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<string>("ShippingAddress")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -72,10 +76,6 @@ namespace Dsw2025Tpi.Data.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasPrecision(15, 2)
-                        .HasColumnType("decimal(15,2)");
 
                     b.HasKey("Id");
 
@@ -98,10 +98,6 @@ namespace Dsw2025Tpi.Data.Migrations
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("Subtotal")
-                        .HasPrecision(30, 2)
-                        .HasColumnType("decimal(30,2)");
 
                     b.Property<decimal>("UnitPrice")
                         .HasPrecision(15, 2)

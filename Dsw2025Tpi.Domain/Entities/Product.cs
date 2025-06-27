@@ -32,6 +32,12 @@ public class Product : EntityBase
     public string? Name { get; set; }
     public decimal CurrentUnitPrice { get; set; }
     public bool IsActive { get; set; }
-    
-    public ICollection<OrderItem> OrderItems { get; set; } 
+
+    public ICollection<OrderItem> OrderItems { get; set; }
+
+    public int RestarStock(int cantidad)
+    {
+        StockCuantity -= cantidad;
+        return StockCuantity;
+    }
 }

@@ -19,14 +19,14 @@ namespace Dsw2025Tpi.Api.Controllers
             _productsManagmentService = productsManagementService;
         }
 
-        //Agregar un producto
+        //Agregar un producto #check
         [HttpPost]
         public async Task<IActionResult> AddProduct([FromBody] ProductModel.ProductRequest request)
         {
             try
             {
                 var product = await _productsManagmentService.AddProduct(request);
-                return Created("Products", product
+                return Created("api/products", product
 
         );
             }
@@ -38,68 +38,99 @@ namespace Dsw2025Tpi.Api.Controllers
             {
                 return Conflict(de.Message);
             }
-            catch (Exception)
+            catch (PriceNullException pe)
             {
-                return Problem("Se produjo un error al guardar el producto");
+                return BadRequest(pe.Message);
+            }
+            catch (Exception e)
+            {
+                return Problem("Se produjo un error al guardar el producto, {0}", e.Message);
             }
         }
 
-        // Obtener todos los productos
+        // Obtener todos los productos #check
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var products = await _productsManagmentService.GetProducts();
-
-            if (!products.Any())
+            try
+            {
+                var products = await _productsManagmentService.GetProducts();
+                return Ok(products); // 200
+            }
+            catch(EntityNotFoundException enft)
+            {
                 return NoContent(); // 204
-
-            return Ok(products);  //200
+            }
+            catch (Exception e)
+            {
+                return Problem("Se produjo un error al obtener los productos, {0}", e.Message);
+            }   
+                        
         }
 
-        // Obtener un producto por ID
+        // Obtener un producto por ID #chek
         [HttpGet("{id:Guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var product = await _productsManagmentService.GetProductById(id);
+            try
+            {
+                var product = await _productsManagmentService.GetProductById(id);
+                return Ok(product); // 200
+            }
+            catch (EntityNotFoundException enft)
+            {
+                return NotFound(enft.Message); // 404
+            }
+            catch (Exception e)
+            {
+                return Problem("Se produjo un error al obtener el producto, {0}", e.Message);
+            }
 
-            if (product is null)
-                return NotFound(); // 404
 
-            return Ok(product); // 200
         }
 
-        //deshabilitar un producto
+        //deshabilitar un producto #check
         [HttpPatch("{id:Guid}")]
         public async Task<IActionResult> Disable(Guid id)
         {
-            var success = await _productsManagmentService.DisableProductAsync(id);
-
-            if (!success)
-                return NotFound();
-
+            try
+            {
+                var success = await _productsManagmentService.DisableProductAsync(id);
+            }
+            catch (EntityNotFoundException enft)
+            {
+                return NotFound(enft.Message); // 404
+            }
+            catch (Exception e)
+            {
+                return Problem("Se produjo un error al deshabilitar el producto, {0}", e.Message);
+            }
             return NoContent(); // 204
         }
 
-        // Actualizar un producto por ID
+        // Actualizar un producto por ID #check
         [HttpPut("{id:Guid}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] ProductModel.ProductRequest request)
         {
-            if (request == null ||
-                string.IsNullOrWhiteSpace(request.Sku) ||
-                string.IsNullOrWhiteSpace(request.InternalCode) ||
-                string.IsNullOrWhiteSpace(request.Name))
-            {
-                return BadRequest();
-            }
-
             try
             {
                 var response = await _productsManagmentService.UpdateAsync(request, id);
                 return Ok(response);
             }
-            catch (KeyNotFoundException)
+            catch (EntityNotFoundException enft)
             {
-                return NotFound();
+                return NotFound(enft.Message);
+            }
+            catch (ArgumentException ae)
+            {
+                return BadRequest(ae.Message);
+            }
+            catch (Exception e)
+            {
+                return Problem("Se produjo un error al actualizar el producto, {0}", e.Message);
+            }
+            {
+
             }
         }
     }

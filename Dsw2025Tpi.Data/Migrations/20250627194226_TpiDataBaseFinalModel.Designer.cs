@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dsw2025Tpi.Data.Migrations
 {
     [DbContext(typeof(Dsw2025TpiContext))]
-    [Migration("20250627165746_TPI_Database_Final2")]
-    partial class TPI_Database_Final2
+    [Migration("20250627194226_TpiDataBaseFinalModel")]
+    partial class TpiDataBaseFinalModel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

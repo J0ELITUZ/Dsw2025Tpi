@@ -1,31 +1,22 @@
 # Trabajo Práctico Integrador
 ## Desarrollo de Software
 ### Backend
+### INTEGRANTES
+58400 Angel Joel Toledo Git (angeljoeltoledo@gmail.com) / INSTITUCIONAL Angel.Toledo@alu.frt.utn.edu.ar
 
-## Introducción
-Se desea desarrollar una plataforma de comercio electrónico (E-commerce). 
-En esta primera etapa el objetivo es construir el módulo de Órdenes, permitiendo la gestión completa de éstas.
+56110 Luis Simon Bravo Luis.Bravo@alu.frt.utn.edu.ar
 
-## Visión General del Producto
-Del relevamiento preliminar se identificaron los siguientes requisitos:
-- Los visitantes pueden consultar los productos sin necesidad de estar registrados o iniciar sesión.
-- Para realizar un pedido se requiere el inicio de sesión.
-- Una orden, para ser aceptada, debe incluir la información básica del cliente, envío y facturación.
-- Antes de registrar la orden se debe verificar la disponibilidad de stock (o existencias) de los productos.
-- Si la orden es exitosa hay que actualizar el stock de cada producto.
-- Se deben poder consultar órdenes individuales o listar varias con posibilidad de filtrado.
-- Será necesario el cambio de estado de una orden a medida que avanza en su ciclo de vida.
-- Los administradores solo pueden gestionar los productos (alta, modificación y baja) y actualizar el estado de la orden.
-- Los clientes pueden crear y consultar órdenes.
+57874-Tolaba Milton Damian Maciel- Milton.Tolaba@alu.frt.utn.edu.ar
 
-[Documento completo](https://frtutneduar.sharepoint.com/:b:/s/DSW2025/ETueAd4rTe1Gilj_Yfi64RYB5oz9s2dOamxKSfMFPREbiA?e=azZcwg) 
+### Instrucciones para uso local 
+1. Al abrir la solución iniciar la consola de comandos de Nuget.
+2. Ejecutar el comando Update-Database.
+3. Ahora que la base de datos está creada el programa está listo para ser ejecutado.
 
-## Alcance para el Primer Parcial
-> [!IMPORTANT]
-> Del apartado `IMPLEMENTACIÓN` (Pag. 7), completo hasta el punto `6` (inclusive)
-
-
-### Características de la Solución
-
-- Lenguaje: C# 12.0
-- Plataforma: .NET 8
+### Descripción de los endpoints
+1. Crear un producto POST, solicita datos de producto al cliente y los almacena en la base de datos. Devuelve el objeto creado y el codigo 201.
+2. Obtener todos los productos GET, consulta la tabla de productos de la base de datos y devuelve todos los productos cuya propiedad IsActive sea true y el codigo 200.
+3. Obtener un producto por Id GET, solicita el id de un producto al cliente y devuelve el objeto producto que coincida con el id y el codigo 200.
+4. Actualiza un producto PUT, solicita el id de un producto al cliente y los datos de modificación para el producto pertinente. Devuelve el objeto actualizado y el codigo 200.
+5. Inhabilitar un producto PATCH, solicita el id de un producto que se desea inhabilitar, para cambiar la propiedad IsActive de este a false. Devuelve el codigo 204.
+6. Agregar una orden POST, solicita customerId, y datos pertinentes de la orden asi tambien como los datos necesarios de cada orderItem para registrar la orden en la base de datos. Devuelve el objeto de la orden creada y el codigo 201.

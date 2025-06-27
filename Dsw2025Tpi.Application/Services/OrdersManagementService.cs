@@ -14,7 +14,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Dsw2025Tpi.Application.Services
 {
-    public class OrderManagement : IOrderManagement
+    public class OrderManagement : IOrderManagementService
     {
         private readonly IRepository _repository;
         public OrderManagement(IRepository repostory)
@@ -39,7 +39,7 @@ namespace Dsw2025Tpi.Application.Services
             // Validar existencia del cliente
             var customer = await _repository.GetById<Customer>(request.CustomerId);
             if (customer == null)
-                throw new ArgumentException("Cliente no encontrado.");
+                throw new EntityNotFoundException($"Cliente no encontrado.");
 
             // validaciones
             foreach (var item in request.OrderItems)
@@ -47,21 +47,23 @@ namespace Dsw2025Tpi.Application.Services
                 var product = await _repository.GetById<Product>(item.ProductId);
 
                 if (product == null)
-                    throw new ArgumentException($"Producto con ID {item.ProductId} no encontrado.");
-
+                    throw new EntityNotFoundException($"Producto con ID {item.ProductId} no encontrado.");
+                if (item.Description != product.Description || item.Name != product.Name)
+                    throw new ArgumentException("Datos de descripcion o nombre no coincidentes");
                 if (product.StockCuantity < item.Quantity)
                     throw new ArgumentException($"No hay suficiente stock para el producto {product.Name}.");
-
                 if (item.Quantity <= 0)
                     throw new ArgumentException($"La cantidad del producto {item.Name} debe ser mayor a 0.");
+                if (item.CurrentUnitPrice <= 0)
+                    throw new ArgumentException($"El precio del producto {item.Name} debe ser mayor a 0.");
                 else
                 {
-                    product.StockCuantity -= item.Quantity; // Restar la cantidad del stock del producto
+                    product.RestarStock(item.Quantity); // Restar la cantidad del producto del stock
                     await _repository.Update(product);
                 }
 
             }
-                       
+
             // Crear la orden 
             {
 
@@ -82,7 +84,7 @@ namespace Dsw2025Tpi.Application.Services
                 foreach (var item in request.OrderItems)
                 {
                     var product = await _repository.GetById<Product>(item.ProductId);
-                    if (product == null) throw new ArgumentException("Producto no encontrado");
+
 
                     var orderItem = new OrderItem
                     {
@@ -110,8 +112,8 @@ namespace Dsw2025Tpi.Application.Services
                     added.TotalAmount,
                     added.OrderItems.Select(oi => new OrderModel.OrderItemResponse(
                 oi.ProductId,
-                oi.Product.Name,
-                oi.Product.Description,
+                oi.Product?.Name ?? "",
+                oi.Product?.Description ?? "",
                 oi.UnitPrice,
                 oi.Quantity,
                 oi.Subtotal
